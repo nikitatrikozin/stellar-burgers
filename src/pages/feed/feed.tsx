@@ -1,19 +1,81 @@
+import { fetchFeed, selectFeed } from '@slices/feedSlice';
+import {
+  fetchIngredients,
+  selectIngredientsError,
+  selectIngredientsStatus,
+} from '@slices/ingredientsSlice';
 import { Preloader } from '@ui';
 import { FeedUI } from '@ui-pages';
+import { useEffect } from 'react';
 
-import type { TOrder } from '@utils-types';
+import { useDispatch, useSelector } from '@services/store';
 
 export const Feed = (): React.JSX.Element => {
-  // TODO: Взять переменную из стора
-  const orders: TOrder[] = [];
+  const dispatch = useDispatch();
+
+  const feed = useSelector(selectFeed);
+  const ingredientsStatus = useSelector(selectIngredientsStatus);
+  const ingredientsError = useSelector(selectIngredientsError);
+
+  useEffect(() => {
+    void dispatch(fetchFeed());
+
+    const intervalId = window.setInterval(() => {
+      void dispatch(fetchFeed());
+    }, 10000);
+
+    return (): void => {
+      window.clearInterval(intervalId);
+    };
+  }, [dispatch]);
 
   const handleGetFeeds = (): void => {
-    // TODO: Запросить ленту заказов
+    void dispatch(fetchFeed());
+
+    if (ingredientsStatus === 'failed') {
+      void dispatch(fetchIngredients());
+    }
   };
 
-  if (!orders.length) {
+  if (ingredientsStatus === 'failed') {
+    return (
+      <div>
+        <p role="alert">{ingredientsError}</p>
+        <button type="button" onClick={handleGetFeeds}>
+          Повторить загрузку
+        </button>
+      </div>
+    );
+  }
+
+  if (!feed.isLoaded && feed.error) {
+    return (
+      <div>
+        <p role="alert">{feed.error}</p>
+        <button type="button" onClick={handleGetFeeds}>
+          Повторить загрузку
+        </button>
+      </div>
+    );
+  }
+
+  if (
+    !feed.isLoaded ||
+    ingredientsStatus === 'idle' ||
+    ingredientsStatus === 'loading'
+  ) {
     return <Preloader />;
   }
 
-  return <FeedUI orders={orders} handleGetFeeds={handleGetFeeds} />;
+  return (
+    <>
+      {feed.isLoading && <p role="status">Обновляем ленту...</p>}
+
+      {feed.error && <p role="alert">{feed.error}</p>}
+
+      {!feed.orders.length && <p>Заказов пока нет</p>}
+
+      <FeedUI orders={feed.orders} handleGetFeeds={handleGetFeeds} />
+    </>
+  );
 };
