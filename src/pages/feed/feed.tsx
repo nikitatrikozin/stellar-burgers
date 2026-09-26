@@ -10,6 +10,8 @@ import { useEffect } from 'react';
 
 import { useDispatch, useSelector } from '@services/store';
 
+import styles from '../order-notifications.module.css';
+
 export const Feed = (): React.JSX.Element => {
   const dispatch = useDispatch();
 
@@ -69,7 +71,13 @@ export const Feed = (): React.JSX.Element => {
 
   return (
     <>
-      {feed.isLoading && <p role="status">Обновляем ленту...</p>}
+      <p
+        className={`${styles.status} text text_type_main-default`}
+        data-visible={feed.isLoading}
+        role="status"
+      >
+        Обновляем ленту...
+      </p>
 
       {feed.error && <p role="alert">{feed.error}</p>}
 

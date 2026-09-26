@@ -10,6 +10,8 @@ import { useEffect } from 'react';
 
 import { useDispatch, useSelector } from '@services/store';
 
+import styles from '../order-notifications.module.css';
+
 export const ProfileOrders = (): React.JSX.Element => {
   const dispatch = useDispatch();
 
@@ -71,7 +73,13 @@ export const ProfileOrders = (): React.JSX.Element => {
     <>
       {history.error && <p role="alert">{history.error}</p>}
 
-      {history.isLoading && <p role="status">Обновляем историю...</p>}
+      <p
+        className={`${styles.status} text text_type_main-default`}
+        data-visible={history.isLoading}
+        role="status"
+      >
+        Обновляем историю...
+      </p>
 
       {!history.orders.length && <p>Вы ещё не оформили ни одного заказа</p>}
 
