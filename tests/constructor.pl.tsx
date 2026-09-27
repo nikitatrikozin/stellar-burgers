@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 test.describe('Конструктор бургера', () => {
   test.beforeEach(async ({ page }) => {
-    await page.routeFromHAR('tests/hars/ingredients.har', {
+    await page.routeFromHAR('tests/hars/constructor.har', {
       url: '**/api/**',
       notFound: 'abort',
     });
@@ -76,6 +76,8 @@ test.describe('Конструктор бургера', () => {
       const ingredientName = 'Краторная булка N-200i';
       const modal = page.getByTestId('modal');
 
+      await expect(modal).toHaveCount(0);
+
       await page.getByRole('link', { name: ingredientName }).click();
 
       await expect(modal).toBeVisible();
@@ -122,6 +124,8 @@ test.describe('Конструктор бургера', () => {
       const modal = page.getByTestId('modal');
       const overlay = page.getByTestId('modal-overlay');
 
+      await expect(modal).toHaveCount(0);
+
       await page.getByRole('link', { name: 'Краторная булка N-200i' }).click();
 
       await expect(modal).toBeVisible();
@@ -136,14 +140,9 @@ test.describe('Конструктор бургера', () => {
 
 test.describe('Оформление заказа', () => {
   test.beforeEach(async ({ page, context }) => {
-    await page.routeFromHAR('tests/hars/ingredients.har', {
+    await page.routeFromHAR('tests/hars/constructor.har', {
       url: '**/api/**',
       notFound: 'abort',
-    });
-
-    await page.routeFromHAR('tests/hars/order.har', {
-      url: '**/api/**',
-      notFound: 'fallback',
     });
 
     await context.addCookies([
@@ -189,6 +188,8 @@ test.describe('Оформление заказа', () => {
     await expect(
       constructorIngredients.getByText(fillingName, { exact: true })
     ).toBeVisible();
+
+    await expect(modal).toHaveCount(0);
 
     await burgerConstructor
       .getByRole('button', { name: 'Оформить заказ', exact: true })

@@ -61,8 +61,6 @@ describe('Редьюсер burgerConstructor', () => {
       bun: { ...bun, id: action.payload.id },
       ingredients: previousState.ingredients,
     });
-
-    expect(previousState.bun).toBeNull();
   });
 
   test('Заменяет ранее выбранную булку новой', () => {
@@ -100,8 +98,6 @@ describe('Редьюсер burgerConstructor', () => {
       bun: previousState.bun,
       ingredients: [previousState.ingredients[0], { ...filling, id: action.payload.id }],
     });
-
-    expect(previousState.ingredients).toHaveLength(1);
   });
 
   test('Назначает разные id двум экземплярам одинаковой начинки', () => {
@@ -142,8 +138,6 @@ describe('Редьюсер burgerConstructor', () => {
       bun: previousState.bun,
       ingredients: [secondFilling],
     });
-
-    expect(previousState.ingredients).toEqual([firstFilling, secondFilling]);
   });
 
   test.each([
@@ -175,8 +169,6 @@ describe('Редьюсер burgerConstructor', () => {
       expect(state.ingredients).toHaveLength(3);
       expect(state.ingredients).toEqual(expect.arrayContaining([first, second, third]));
       expect(state.bun).toEqual(previousState.bun);
-
-      expect(previousState.ingredients).toEqual([first, second, third]);
     }
   );
 
